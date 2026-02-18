@@ -1,0 +1,117 @@
+You are building FutureFork - a probabilistic career decision simulator that uses AI to generate structured scenario forecasts.
+
+## Core Concept
+
+NOT an advice chatbot. It's a simulation engine that converts user decisions into probability-weighted future scenarios.
+
+## Tech Stack
+
+- Next.js 14 (App Router)
+- TypeScript (strict mode)
+- Tailwind CSS
+- shadcn/ui components
+- Google Gemini API (gemini-2.5-flash)
+- React Hook Form + Zod validation
+
+## Architecture Flow
+
+1. User inputs structured data (profile + two options)
+2. Backend calls AI with strict JSON prompt
+3. AI returns probability-weighted scenarios (best/average/worst case)
+4. Server sanitizes response (clamp values, normalize probabilities)
+5. Frontend renders comparison view with visual scenarios
+
+## Data Structure
+
+### Input
+
+{
+profile: {
+age: number,
+major: string,
+school?: string,
+gpa?: number,
+riskTolerance: 1-10,
+goals: ["money" | "stability" | "freedom" | "impact"]
+},
+optionA: string,
+optionB: string
+}
+
+### Output (per option)
+
+{
+bestCase: { income5Year, income10Year, probability, description },
+averageCase: { ... },
+worstCase: { ... },
+riskScore: 0-100,
+stressLevel: 0-100,
+careerTrajectory: string,
+reasoning: string[]
+}
+
+## AI Behavior
+
+- Returns ONLY valid JSON (no markdown, no explanations)
+- Uses statistical reasoning, not fortune-telling
+- Probabilities must sum to 1.0
+- Income ranges based on industry benchmarks
+- Risk/stress scores derived from career volatility data
+
+## UI Principles
+
+- Clean, minimal, iOS-inspired design
+- Dark mode with glassmorphism
+- Scenario cards: Green (best), Yellow (average), Red (worst)
+- Side-by-side comparison for options A vs B
+- Visual probability bars, risk gauges
+- NO cluttered layouts, NO excessive text
+
+## Implementation Rules
+
+1. All numeric inputs must be validated and clamped
+2. AI responses must be sanitized before rendering
+3. Error states must show user-friendly messages
+4. Loading states during API calls
+5. Responsive design (mobile-first)
+6. Type safety everywhere (no 'any' types)
+
+## File Structure
+
+/app
+/api/simulate/route.ts
+/page.tsx
+/layout.tsx
+/components
+/DecisionForm.tsx
+/ScenarioCard.tsx
+/ComparisonView.tsx
+/RiskGauge.tsx
+/lib
+/types.ts
+/ai.ts
+/sanitize.ts
+/validation.ts
+
+## MVP Success Criteria
+
+✅ Form accepts user input
+✅ API calls Claude and gets structured JSON
+✅ Response is sanitized and validated
+✅ UI shows best/avg/worst scenarios for both options
+✅ Recommendation logic picks better option
+✅ All data is type-safe
+✅ Mobile responsive
+
+## Code Style
+
+- Functional components only
+- Custom hooks for logic separation
+- Async/await (no .then chains)
+- Early returns for error handling
+- Descriptive variable names
+- Comments only for complex logic
+
+When I ask you to build features, follow this architecture strictly. Ask clarifying questions if requirements are ambiguous. Prioritize working code over perfect code.
+
+Ready to build.
