@@ -1,9 +1,9 @@
 import type { ComparisonOutput, SimulationResult } from "@/lib/types";
 import { ScenarioCard, type ScenarioLabel } from "@/components/ScenarioCard";
+import { SocialComparisonCard as SocialComparison } from "@/components/SocialComparison";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Users, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const GAUGE_SIZE = 88;
@@ -15,6 +15,13 @@ const CIRCUMFERENCE = 2 * Math.PI * GAUGE_R;
 
 const warmCardClass =
   "rounded-2xl border border-white/70 bg-white/80 shadow-warm backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:shadow-warm-hover";
+
+const MAX_OPTION_NAME_LENGTH = 20;
+
+function truncateOptionName(name: string): string {
+  if (!name || name.length <= MAX_OPTION_NAME_LENGTH) return name;
+  return name.slice(0, MAX_OPTION_NAME_LENGTH).trim() + "...";
+}
 
 function CircularGauge({
   value,
@@ -76,10 +83,11 @@ function OptionColumn({ result, optionLabel }: { result: SimulationResult; optio
     { scenario: result.averageCase, label: "Average" },
     { scenario: result.worstCase, label: "Worst" },
   ];
+  const displayName = truncateOptionName(result.optionName || result.option || `Option ${optionLabel}`);
   return (
     <div className="space-y-4 sm:space-y-5">
       <h2 className="text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
-        Option {optionLabel}: {result.option || `Option ${optionLabel}`}
+        Option {optionLabel}: {displayName}
       </h2>
       <div className="space-y-3 sm:space-y-4">
         {scenarios.map(({ scenario, label }) => (
@@ -123,35 +131,99 @@ export function ComparisonView({ data }: ComparisonViewProps) {
   const betterB = recommendation.better === "B";
 
   return (
-    <div className="space-y-8 sm:space-y-10 text-slate-900">
-      {/* Bento-style two columns */}
-      <div className="grid grid-cols-1 gap-6 md:gap-8 md:grid-cols-2">
-        <div
-          className={cn(
-            warmCardClass,
-            "p-5 sm:p-6",
-            betterA && "ring-2 ring-emerald-400/50"
-          )}
-        >
-          <OptionColumn result={optionA} optionLabel="A" />
+    <div className="text-slate-900">
+      <div className="space-y-4">
+        {/* Bento-style two columns */}
+        <div className="grid grid-cols-1 gap-6 md:gap-8 md:grid-cols-2">
+          <div
+            className={cn(
+              warmCardClass,
+              "p-5 sm:p-6",
+              betterA && "ring-2 ring-emerald-400/50"
+            )}
+          >
+            <OptionColumn result={optionA} optionLabel="A" />
+          </div>
+          <div
+            className={cn(
+              warmCardClass,
+              "p-5 sm:p-6",
+              betterB && "ring-2 ring-emerald-400/50"
+            )}
+          >
+            <OptionColumn result={optionB} optionLabel="B" />
+          </div>
         </div>
-        <div
-          className={cn(
-            warmCardClass,
-            "p-5 sm:p-6",
-            betterB && "ring-2 ring-emerald-400/50"
-          )}
-        >
-          <OptionColumn result={optionB} optionLabel="B" />
-        </div>
-      </div>
 
-      <Separator className="bg-white/70" />
+        <Separator className="bg-white/70" />
+        {/* A vs B choice split */}
+        {data.choiceSplit != null ? (
+          <Card className={cn(warmCardClass, "overflow-hidden")}>
+            <CardHeader className="pb-3 p-6 sm:p-8">
+              <CardTitle className="text-lg font-bold text-slate-900">
+                How would similar profiles choose?
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-0 px-6 pb-6 sm:px-8 sm:pb-8">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-slate-700">Option A</p>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-bold text-slate-900">
+                      {Math.round(Math.min(100, Math.max(0, data.choiceSplit.optionA)))}
+                    </span>
+                    <span className="text-slate-600">%</span>
+                  </div>
+                  <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-200/80">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-orange-400 to-amber-500 transition-all duration-500"
+                      style={{ width: `${Math.min(100, Math.max(0, data.choiceSplit.optionA))}%` }}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-slate-700">Option B</p>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-bold text-slate-900">
+                      {Math.round(Math.min(100, Math.max(0, data.choiceSplit.optionB)))}
+                    </span>
+                    <span className="text-slate-600">%</span>
+                  </div>
+                  <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-200/80">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-500"
+                      style={{ width: `${Math.min(100, Math.max(0, data.choiceSplit.optionB))}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-slate-500">
+                Among profiles like yours, what share would pick each option.
+              </p>
+            </CardContent>
+          </Card>
+        ) : null}
 
-      <Card className={cn(warmCardClass, "overflow-hidden")}>
-        <CardHeader className="pb-2 p-6 sm:p-8">
-          <CardTitle className="text-lg font-bold text-slate-900">Recommendation</CardTitle>
-        </CardHeader>
+        {/* In similar situations */}
+        <Card className={cn(warmCardClass, "overflow-hidden")}>
+          <CardContent className="p-6 sm:p-8">
+            <p className="text-sm text-slate-700">
+              In similar situations:{" "}
+              <span className={data.percentageOptionA >= data.percentageOptionB ? "font-semibold text-orange-600" : "text-slate-500"}>
+                {Math.round(Math.min(100, Math.max(0, data.percentageOptionA)))}% chose {truncateOptionName(data.optionA.optionName || data.optionA.option || "Option A")}
+              </span>
+              {", "}
+              <span className={data.percentageOptionB >= data.percentageOptionA ? "font-semibold text-orange-600" : "text-slate-500"}>
+                {Math.round(Math.min(100, Math.max(0, data.percentageOptionB)))}% chose {truncateOptionName(data.optionB.optionName || data.optionB.option || "Option B")}
+              </span>
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className={cn(warmCardClass, "overflow-hidden")}>
+          <CardHeader className="pb-2 p-6 sm:p-8">
+            <CardTitle className="text-lg font-bold text-slate-900">Recommendation</CardTitle>
+          </CardHeader>
         <CardContent className="space-y-4 pt-0 px-6 pb-6 sm:px-8 sm:pb-8">
           <div className="flex flex-wrap items-center gap-2">
             {isTie ? (
@@ -163,7 +235,9 @@ export function ComparisonView({ data }: ComparisonViewProps) {
               </Badge>
             ) : (
               <Badge className="text-sm font-medium bg-emerald-500/15 text-emerald-800 border border-emerald-400/40">
-                Option {recommendation.better} is better
+                {recommendation.better === "A"
+                  ? truncateOptionName(data.optionA.optionName || data.optionA.option || "Option A")
+                  : truncateOptionName(data.optionB.optionName || data.optionB.option || "Option B")} is better
               </Badge>
             )}
           </div>
@@ -174,49 +248,13 @@ export function ComparisonView({ data }: ComparisonViewProps) {
           ) : null}
         </CardContent>
       </Card>
+      </div>
 
-      {/* Social Comparison */}
-      {data.socialComparison?.choices?.length ? (
-        <>
-          <Separator className="bg-white/70" />
-          <Card className={cn(warmCardClass, "overflow-hidden")}>
-            <CardHeader className="pb-3 p-6 sm:p-8">
-              <CardTitle className="flex items-center gap-2 text-lg font-bold text-slate-900">
-                <Users className="h-5 w-5 text-orange-500 shrink-0" aria-hidden />
-                What do similar profiles choose?
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 pt-0 px-6 pb-6 sm:px-8 sm:pb-8">
-              <p className="text-sm text-slate-700">
-                Among {data.socialComparison.demographics}:
-              </p>
-              <div className="space-y-3">
-                {data.socialComparison.choices.map((item, i) => {
-                  const pct = Math.min(100, Math.max(0, item.percentage));
-                  return (
-                    <div key={i} className="space-y-1.5">
-                      <div className="flex justify-between text-sm">
-                        <span className="font-medium text-slate-900">{item.option}</span>
-                        <span className="text-slate-600">{pct}%</span>
-                      </div>
-                      <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-200/80">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-orange-400 to-amber-500 transition-all duration-500"
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              <p className="flex items-center gap-1.5 text-xs text-slate-500 italic pt-1">
-                <Info className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                Based on industry trends and statistical analysis, not real user data.
-              </p>
-            </CardContent>
-          </Card>
-        </>
-      ) : null}
+      {data.socialComparison && (
+        <div className="mt-8 sm:mt-10">
+          <SocialComparison data={data.socialComparison} />
+        </div>
+      )}
     </div>
   );
 }

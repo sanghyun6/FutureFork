@@ -63,6 +63,7 @@ const defaultScenario: Scenario = {
 export function sanitizeSimulation(raw: SimulationResult): SimulationResult {
   const obj = raw && typeof raw === "object" ? (raw as unknown as Record<string, unknown>) : raw;
   const option = safeString(obj?.option, "Option");
+  const optionName = safeString(obj?.optionName, option);
 
   const bestCase = sanitizeScenario(obj?.bestCase, defaultScenario);
   const averageCase = sanitizeScenario(obj?.averageCase, defaultScenario);
@@ -81,6 +82,7 @@ export function sanitizeSimulation(raw: SimulationResult): SimulationResult {
 
   return {
     option,
+    optionName,
     bestCase: best,
     averageCase: average,
     worstCase: worst,

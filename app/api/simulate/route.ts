@@ -93,9 +93,12 @@ export async function POST(request: NextRequest) {
 
     const output = await runSimulation(validated.data);
     const sanitized: ComparisonOutput = {
-      optionA: sanitizeSimulation(output.optionA),
-      optionB: sanitizeSimulation(output.optionB),
+      optionA: { ...sanitizeSimulation(output.optionA), optionName: validated.data.optionA },
+      optionB: { ...sanitizeSimulation(output.optionB), optionName: validated.data.optionB },
+      percentageOptionA: output.percentageOptionA,
+      percentageOptionB: output.percentageOptionB,
       recommendation: output.recommendation,
+      socialComparison: output.socialComparison,
     };
 
     return NextResponse.json(sanitized, { headers: corsHeaders(origin) });

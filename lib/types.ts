@@ -26,6 +26,7 @@ export interface Scenario {
 /** Full simulation result for one career option */
 export interface SimulationResult {
   option: string;
+  optionName: string;
   bestCase: Scenario;
   averageCase: Scenario;
   worstCase: Scenario;
@@ -41,22 +42,31 @@ export interface Recommendation {
   reason: string;
 }
 
-/** One choice in the social comparison (option name + percentage) */
-export interface SocialComparisonChoice {
-  option: string;
-  percentage: number;
-}
-
 /** Social comparison: what similar profiles tend to choose */
 export interface SocialComparison {
   demographics: string;
-  choices: SocialComparisonChoice[];
+  choices: Array<{
+    option: string;
+    percentage: number;
+  }>;
+}
+
+/** Percent of similar profiles who would choose A vs B (sums to 100) */
+export interface ChoiceSplit {
+  optionA: number;
+  optionB: number;
 }
 
 /** Full comparison response from the simulate API */
 export interface ComparisonOutput {
   optionA: SimulationResult;
   optionB: SimulationResult;
-  recommendation: Recommendation;
-  socialComparison?: SocialComparison;
+  percentageOptionA: number;
+  percentageOptionB: number;
+  choiceSplit?: ChoiceSplit;
+  recommendation: {
+    better: "A" | "B" | "tie";
+    reason: string;
+  };
+  socialComparison: SocialComparison;
 }

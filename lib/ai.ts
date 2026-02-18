@@ -42,19 +42,57 @@ Option A: ${input.optionA}
 Option B: ${input.optionB}
 
 Return a single JSON object with:
-- optionA: SimulationResult for option A (use option: "A")
-- optionB: SimulationResult for option B (use option: "B")
+- optionA: SimulationResult for option A (use option: "A", optionName: the exact label the user gave for Option A above)
+- optionB: SimulationResult for option B (use option: "B", optionName: the exact label the user gave for Option B above)
+- percentageOptionA: number (0-100) — share of similar profiles who chose option A
+- percentageOptionB: number (0-100) — share of similar profiles who chose option B (percentageOptionA + percentageOptionB must sum to 100)
+- choiceSplit: { optionA: number, optionB: number } — percentage of similar profiles who would choose option A vs B (must sum to 100)
 - recommendation: { better: "A" | "B" | "tie", reason: string }
 - socialComparison: { demographics: string, choices: [{ option: string, percentage: number }, ...] }
 
-Each SimulationResult must have: option, bestCase, averageCase, worstCase (each with income5Year, income10Year, probability, description), riskScore (0-100), stressLevel (0-100), careerTrajectory, reasoning (string array). Probabilities for best/average/worst per option should sum to 1.0.
+Each SimulationResult must have: option, optionName (the user's choice label from above), bestCase, averageCase, worstCase (each with income5Year, income10Year, probability, description), riskScore (0-100), stressLevel (0-100), careerTrajectory, reasoning (string array). Probabilities for best/average/worst per option should sum to 1.0.
 
-For socialComparison: generate realistic statistics for what people with similar profiles tend to choose. Base it on the user's major, age range (e.g. "aged 20-25"), and risk tolerance level (low/medium/high). demographics should be a short phrase like "CS majors aged 20-25 with high risk tolerance". choices should be 3-5 career path options (e.g. "Big Tech", "Startups", "Grad School") with percentages that sum to 100. Use current industry trends; options can include or relate to the user's Option A/B but should be general category names.`;
+For choiceSplit: estimate what percentage of people with the same profile (major, age, risk tolerance) would choose the user's Option A vs Option B; two numbers that sum to 100.
+
+Also generate a socialComparison object with:
+- demographics: string describing the user profile (e.g., 'CS majors aged 20-25 with high risk tolerance')
+- choices: array of 3 choices with option name and percentage (must sum to 100)
+
+Base percentages on realistic industry trends and career statistics. The response must include the socialComparison field in the returned JSON.
+
+IMPORTANT: Your response MUST include these two fields at the root level:
+- percentageOptionA: A number between 0-100 representing how many people in similar situations choose Option A
+- percentageOptionB: A number between 0-100 representing how many people choose Option B
+These two numbers MUST sum to exactly 100.
+
+Example response structure:
+{
+  optionA: {...},
+  optionB: {...},
+  recommendation: {...},
+  percentageOptionA: 65,
+  percentageOptionB: 35
+}`;
 
     const result = await model.generateContent(userPrompt);
     const rawText = result.response.text();
+    console.log("[runSimulation] Raw AI response:", rawText);
+
     const jsonText = stripJsonMarkdown(rawText);
     const parsed = JSON.parse(jsonText) as ComparisonOutput;
+
+    const pctA = typeof parsed.percentageOptionA === "number" && !Number.isNaN(parsed.percentageOptionA)
+      ? Math.min(100, Math.max(0, parsed.percentageOptionA))
+      : 50;
+    const pctB = typeof parsed.percentageOptionB === "number" && !Number.isNaN(parsed.percentageOptionB)
+      ? Math.min(100, Math.max(0, parsed.percentageOptionB))
+      : 50;
+    const sum = pctA + pctB;
+    parsed.percentageOptionA = sum > 0 ? Math.round((pctA / sum) * 100) : 50;
+    parsed.percentageOptionB = sum > 0 ? Math.round((pctB / sum) * 100) : 50;
+    if (parsed.percentageOptionA + parsed.percentageOptionB !== 100) {
+      parsed.percentageOptionB = 100 - parsed.percentageOptionA;
+    }
 
     return parsed;
   } catch (err) {
