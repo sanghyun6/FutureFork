@@ -3,6 +3,7 @@ import { ScenarioCard, type ScenarioLabel } from "@/components/ScenarioCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Users, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const GAUGE_SIZE = 88;
@@ -173,6 +174,49 @@ export function ComparisonView({ data }: ComparisonViewProps) {
           ) : null}
         </CardContent>
       </Card>
+
+      {/* Social Comparison */}
+      {data.socialComparison?.choices?.length ? (
+        <>
+          <Separator className="bg-white/70" />
+          <Card className={cn(warmCardClass, "overflow-hidden")}>
+            <CardHeader className="pb-3 p-6 sm:p-8">
+              <CardTitle className="flex items-center gap-2 text-lg font-bold text-slate-900">
+                <Users className="h-5 w-5 text-orange-500 shrink-0" aria-hidden />
+                What do similar profiles choose?
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-0 px-6 pb-6 sm:px-8 sm:pb-8">
+              <p className="text-sm text-slate-700">
+                Among {data.socialComparison.demographics}:
+              </p>
+              <div className="space-y-3">
+                {data.socialComparison.choices.map((item, i) => {
+                  const pct = Math.min(100, Math.max(0, item.percentage));
+                  return (
+                    <div key={i} className="space-y-1.5">
+                      <div className="flex justify-between text-sm">
+                        <span className="font-medium text-slate-900">{item.option}</span>
+                        <span className="text-slate-600">{pct}%</span>
+                      </div>
+                      <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-200/80">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-orange-400 to-amber-500 transition-all duration-500"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="flex items-center gap-1.5 text-xs text-slate-500 italic pt-1">
+                <Info className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                Based on industry trends and statistical analysis, not real user data.
+              </p>
+            </CardContent>
+          </Card>
+        </>
+      ) : null}
     </div>
   );
 }

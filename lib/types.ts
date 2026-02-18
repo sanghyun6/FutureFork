@@ -41,9 +41,22 @@ export interface Recommendation {
   reason: string;
 }
 
+/** One choice in the social comparison (option name + percentage) */
+export interface SocialComparisonChoice {
+  option: string;
+  percentage: number;
+}
+
+/** Social comparison: what similar profiles tend to choose */
+export interface SocialComparison {
+  demographics: string;
+  choices: SocialComparisonChoice[];
+}
+
 /** Full comparison response from the simulate API */
 export interface ComparisonOutput {
   optionA: SimulationResult;
   optionB: SimulationResult;
   recommendation: Recommendation;
+  socialComparison?: SocialComparison;
 }

@@ -45,8 +45,11 @@ Return a single JSON object with:
 - optionA: SimulationResult for option A (use option: "A")
 - optionB: SimulationResult for option B (use option: "B")
 - recommendation: { better: "A" | "B" | "tie", reason: string }
+- socialComparison: { demographics: string, choices: [{ option: string, percentage: number }, ...] }
 
-Each SimulationResult must have: option, bestCase, averageCase, worstCase (each with income5Year, income10Year, probability, description), riskScore (0-100), stressLevel (0-100), careerTrajectory, reasoning (string array). Probabilities for best/average/worst per option should sum to 1.0.`;
+Each SimulationResult must have: option, bestCase, averageCase, worstCase (each with income5Year, income10Year, probability, description), riskScore (0-100), stressLevel (0-100), careerTrajectory, reasoning (string array). Probabilities for best/average/worst per option should sum to 1.0.
+
+For socialComparison: generate realistic statistics for what people with similar profiles tend to choose. Base it on the user's major, age range (e.g. "aged 20-25"), and risk tolerance level (low/medium/high). demographics should be a short phrase like "CS majors aged 20-25 with high risk tolerance". choices should be 3-5 career path options (e.g. "Big Tech", "Startups", "Grad School") with percentages that sum to 100. Use current industry trends; options can include or relate to the user's Option A/B but should be general category names.`;
 
     const result = await model.generateContent(userPrompt);
     const rawText = result.response.text();
