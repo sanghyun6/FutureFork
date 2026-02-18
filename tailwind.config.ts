@@ -9,6 +9,9 @@ const config: Config = {
   ],
   theme: {
   	extend: {
+  		fontFamily: {
+  			sans: ['var(--font-inter)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+  		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
@@ -57,7 +60,8 @@ const config: Config = {
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		boxShadow: {
-  			glow: '0 0 40px -8px rgba(147, 51, 234, 0.35), 0 0 20px -10px rgba(255, 255, 255, 0.2)'
+  			'warm': '0 10px 40px -10px rgba(249, 115, 22, 0.15)',
+  			'warm-hover': '0 25px 50px -12px rgba(251, 146, 60, 0.25)'
   		}
   	}
   },

@@ -97,14 +97,14 @@ export function DecisionForm({ onResult, onLoadingChange }: DecisionFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-7">
       {/* Age */}
       <div className="space-y-2">
         <div className="flex justify-between text-sm">
-          <label htmlFor="age" className="font-medium">
+          <label htmlFor="age" className="font-bold text-slate-900">
             Age
           </label>
-          <span className="text-muted-foreground">{age}</span>
+          <span className="text-slate-600">{age}</span>
         </div>
         <Slider
           id="age"
@@ -118,7 +118,7 @@ export function DecisionForm({ onResult, onLoadingChange }: DecisionFormProps) {
 
       {/* Major */}
       <div className="space-y-2">
-        <label htmlFor="major" className="text-sm font-medium">
+        <label htmlFor="major" className="text-sm font-bold text-slate-900">
           Major
         </label>
         <Input
@@ -131,8 +131,8 @@ export function DecisionForm({ onResult, onLoadingChange }: DecisionFormProps) {
 
       {/* School (optional) */}
       <div className="space-y-2">
-        <label htmlFor="school" className="text-sm font-medium">
-          School <span className="text-muted-foreground">(optional)</span>
+        <label htmlFor="school" className="text-sm font-bold text-slate-900">
+          School <span className="font-normal text-slate-500">(optional)</span>
         </label>
         <Input
           id="school"
@@ -150,14 +150,14 @@ export function DecisionForm({ onResult, onLoadingChange }: DecisionFormProps) {
             checked={includeGpa}
             onCheckedChange={(c) => setIncludeGpa(c === true)}
           />
-          <label htmlFor="include-gpa" className="text-sm font-medium cursor-pointer">
-            Include GPA <span className="text-muted-foreground">(optional)</span>
+          <label htmlFor="include-gpa" className="text-sm font-bold text-slate-900 cursor-pointer">
+            Include GPA <span className="font-normal text-slate-500">(optional)</span>
           </label>
         </div>
         {includeGpa && (
           <div className="space-y-2 pl-6">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">GPA</span>
+              <span className="text-slate-600">GPA</span>
               <span className="font-medium">{gpa.toFixed(1)}</span>
             </div>
             <Slider
@@ -174,7 +174,7 @@ export function DecisionForm({ onResult, onLoadingChange }: DecisionFormProps) {
       {/* Risk tolerance */}
       <div className="space-y-2">
         <div className="flex justify-between items-center text-sm">
-          <label htmlFor="risk" className="font-medium">
+          <label htmlFor="risk" className="font-bold text-slate-900">
             Risk tolerance
           </label>
           <span className="text-lg" aria-hidden>
@@ -189,19 +189,19 @@ export function DecisionForm({ onResult, onLoadingChange }: DecisionFormProps) {
           value={[riskTolerance]}
           onValueChange={([v]) => setRiskTolerance(v ?? 1)}
         />
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-slate-600">
           Low (😰) to high (🚀)
         </p>
       </div>
 
       {/* Goals */}
       <div className="space-y-3">
-        <span className="text-sm font-medium">Goals</span>
+        <span className="text-sm font-bold text-slate-900">Goals</span>
         <div className="flex flex-wrap gap-4">
           {GOAL_OPTIONS.map(({ value, label }) => (
             <label
               key={value}
-              className="flex items-center gap-2 cursor-pointer text-sm"
+              className="flex items-center gap-2 cursor-pointer text-sm text-slate-900"
             >
               <Checkbox
                 checked={goals.includes(value)}
@@ -215,7 +215,7 @@ export function DecisionForm({ onResult, onLoadingChange }: DecisionFormProps) {
 
       {/* Option A & B */}
       <div className="space-y-2">
-        <label htmlFor="option-a" className="text-sm font-medium">
+        <label htmlFor="option-a" className="text-sm font-bold text-slate-900">
           Option A
         </label>
         <Input
@@ -226,7 +226,7 @@ export function DecisionForm({ onResult, onLoadingChange }: DecisionFormProps) {
         />
       </div>
       <div className="space-y-2">
-        <label htmlFor="option-b" className="text-sm font-medium">
+        <label htmlFor="option-b" className="text-sm font-bold text-slate-900">
           Option B
         </label>
         <Input
@@ -243,7 +243,11 @@ export function DecisionForm({ onResult, onLoadingChange }: DecisionFormProps) {
         </p>
       )}
 
-      <Button type="submit" className="w-full" disabled={loading}>
+      <Button
+        type="submit"
+        className="w-full rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-semibold shadow-warm hover:from-orange-600 hover:to-amber-600 hover:shadow-warm-hover transition-all duration-300"
+        disabled={loading}
+      >
         {loading ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />

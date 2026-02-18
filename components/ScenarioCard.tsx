@@ -4,27 +4,28 @@ import { useEffect, useState } from "react";
 import type { Scenario } from "@/lib/types";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { TrendingUp, Target, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const LABEL_STYLES = {
+const SCENARIO_CONFIG = {
   Best: {
-    border: "border-l-green-500/80",
-    badge: "border-green-400/50 bg-green-500/20 text-green-300",
+    leftGradient: "from-emerald-500 to-teal-500",
+    icon: TrendingUp,
+    badge: "bg-emerald-500/10 text-emerald-700 border-emerald-400/40",
+    bar: "bg-gradient-to-r from-emerald-500 to-teal-500",
   },
   Average: {
-    border: "border-l-yellow-500/80",
-    badge: "border-yellow-400/50 bg-yellow-500/20 text-yellow-300",
+    leftGradient: "from-orange-400 to-pink-400",
+    icon: Target,
+    badge: "bg-orange-400/10 text-orange-700 border-orange-400/40",
+    bar: "bg-gradient-to-r from-orange-400 to-pink-400",
   },
   Worst: {
-    border: "border-l-red-500/80",
-    badge: "border-red-400/50 bg-red-500/20 text-red-300",
+    leftGradient: "from-rose-600 to-red-700",
+    icon: AlertCircle,
+    badge: "bg-rose-600/10 text-rose-700 border-rose-500/40",
+    bar: "bg-gradient-to-r from-rose-600 to-red-700",
   },
-} as const;
-
-const PROGRESS_COLORS = {
-  Best: "bg-green-500",
-  Average: "bg-yellow-500",
-  Worst: "bg-red-500",
 } as const;
 
 function formatCurrency(value: number): string {
@@ -67,53 +68,65 @@ export interface ScenarioCardProps {
 }
 
 export function ScenarioCard({ scenario, label }: ScenarioCardProps) {
-  const styles = LABEL_STYLES[label];
+  const config = SCENARIO_CONFIG[label];
+  const Icon = config.icon;
   const progressPct = Math.min(100, Math.max(0, scenario.probability * 100));
   const income5 = useCountUp(scenario.income5Year, true);
   const income10 = useCountUp(scenario.income10Year, true);
 
   return (
-    <Card
+    <div
       className={cn(
-        "glass-card border-l-4 transition-all duration-200",
-        "hover:shadow-glow hover:border-white/30",
-        styles.border
+        "flex overflow-hidden rounded-2xl border border-white/70 bg-white/80 shadow-warm backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:shadow-warm-hover"
       )}
     >
-      <CardHeader className="pb-2 p-4 sm:p-6">
-        <Badge variant="outline" className={cn("w-fit", styles.badge)}>
-          {label} case
-        </Badge>
-      </CardHeader>
-      <CardContent className="space-y-3 pt-0 px-4 pb-4 sm:px-6 sm:pb-6">
-        <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-white">
-          <span>
-            <span className="text-white/70">5 yr:</span>{" "}
-            {formatCurrency(income5)}
-          </span>
-          <span>
-            <span className="text-white/70">10 yr:</span>{" "}
-            {formatCurrency(income10)}
-          </span>
-        </div>
-        <div className="space-y-1.5">
-          <div className="flex justify-between text-xs text-white/70">
-            <span>Probability</span>
-            <span className="text-white">{progressPct >= 99.95 ? "100" : progressPct.toFixed(1)}%</span>
+      {/* 4px gradient left border */}
+      <div
+        className={cn("w-1 shrink-0 bg-gradient-to-b", config.leftGradient)}
+        aria-hidden
+      />
+      <Card className="flex-1 border-0 border-l-0 shadow-none bg-transparent rounded-none">
+        <CardHeader className="pb-2 pt-4 pr-4 pb-2 pl-4 sm:pl-5">
+          <div className="flex items-center gap-2">
+            <Icon className="h-4 w-4 shrink-0 text-slate-600" aria-hidden />
+            <Badge
+              variant="outline"
+              className={cn("w-fit text-xs font-medium", config.badge)}
+            >
+              {label} case
+            </Badge>
           </div>
-          <div className="relative h-2 w-full overflow-hidden rounded-full bg-white/20">
-            <div
-              className={cn("h-full transition-all duration-500", PROGRESS_COLORS[label])}
-              style={{ width: `${progressPct}%` }}
-            />
+        </CardHeader>
+        <CardContent className="space-y-3 pt-0 px-4 pb-4 sm:px-5 sm:pb-5">
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-900">
+            <span>
+              <span className="text-slate-600">5 yr:</span> {formatCurrency(income5)}
+            </span>
+            <span>
+              <span className="text-slate-600">10 yr:</span> {formatCurrency(income10)}
+            </span>
           </div>
-        </div>
-        {scenario.description ? (
-          <p className="text-sm text-white/80 leading-relaxed">
-            {scenario.description}
-          </p>
-        ) : null}
-      </CardContent>
-    </Card>
+          <div className="space-y-1.5">
+            <div className="flex justify-between text-xs text-slate-600">
+              <span>Probability</span>
+              <span className="font-medium text-slate-900">
+                {progressPct >= 99.95 ? "100" : progressPct.toFixed(1)}%
+              </span>
+            </div>
+            <div className="relative h-2 w-full overflow-hidden rounded-full bg-slate-200/80">
+              <div
+                className={cn("h-full transition-all duration-500 rounded-full", config.bar)}
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
+          </div>
+          {scenario.description ? (
+            <p className="text-sm text-slate-700 leading-relaxed">
+              {scenario.description}
+            </p>
+          ) : null}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
+const warmCardClass =
+  "rounded-2xl border border-white/70 bg-white/80 shadow-warm backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:shadow-warm-hover";
+
 export default function Home() {
   const formSectionRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState<DecisionInput | null>(null);
@@ -28,20 +31,23 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-900/40 to-slate-900 text-white">
+    <div className="min-h-screen bg-gradient-to-b from-orange-50 via-amber-50 to-yellow-50">
       <div
         className={cn(
-          "mx-auto px-4 py-8 sm:px-6 sm:py-12 lg:px-8",
+          "mx-auto px-5 py-12 sm:px-8 sm:py-16 lg:px-10",
           result ? "max-w-5xl" : "max-w-2xl"
         )}
       >
         {/* Hero */}
-        <header className="mb-8 text-center sm:mb-10">
-          <h1 className="text-2xl font-bold tracking-tight text-white sm:text-4xl">
+        <header className="mb-12 text-center sm:mb-16">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
             FutureFork
           </h1>
-          <p className="mt-1.5 text-sm text-white/80 sm:mt-2 sm:text-base">
+          <p className="mt-4 text-lg text-slate-700 sm:text-xl max-w-xl mx-auto leading-relaxed">
             AI-Powered Career Decision Simulator
+          </p>
+          <p className="mt-2 text-sm text-slate-600">
+            Compare paths. See scenarios. Choose with clarity.
           </p>
         </header>
 
@@ -49,12 +55,12 @@ export default function Home() {
         <div ref={formSectionRef}>
           <Card
             className={cn(
-              "glass-card mb-8 sm:mb-10",
-              "hover:shadow-glow hover:border-white/30",
+              warmCardClass,
+              "mb-12",
               loading && "pointer-events-none opacity-70"
             )}
           >
-            <CardContent className="p-4 sm:p-6 lg:p-8">
+            <CardContent className="p-8 sm:p-10 lg:p-12">
               <DecisionForm
                 key={formKey}
                 onResult={handleResult}
@@ -64,16 +70,16 @@ export default function Home() {
           </Card>
         </div>
 
-        {/* Results */}
+        {/* Results - Bento grid feel */}
         {result && (
-          <div className="glass-card rounded-xl p-4 sm:p-6">
+          <div className={cn(warmCardClass, "p-6 sm:p-8 lg:p-10")}>
             <ComparisonView data={result} />
-            <div className="mt-6 flex justify-center sm:mt-8">
+            <div className="mt-10 flex justify-center">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleStartOver}
-                className="border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/30 hover:shadow-glow"
+                className="rounded-xl border-orange-200 bg-white/60 text-slate-700 hover:bg-orange-50 hover:border-orange-300 hover:shadow-warm transition-all duration-300"
               >
                 Start Over
               </Button>

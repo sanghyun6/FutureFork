@@ -12,6 +12,9 @@ const GAUGE_CX = GAUGE_SIZE / 2;
 const GAUGE_CY = GAUGE_SIZE / 2;
 const CIRCUMFERENCE = 2 * Math.PI * GAUGE_R;
 
+const warmCardClass =
+  "rounded-2xl border border-white/70 bg-white/80 shadow-warm backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:shadow-warm-hover";
+
 function CircularGauge({
   value,
   label,
@@ -39,7 +42,7 @@ function CircularGauge({
             fill="none"
             stroke="currentColor"
             strokeWidth={GAUGE_STROKE}
-            className="text-white/20"
+            className="text-slate-200"
           />
           <circle
             cx={GAUGE_CX}
@@ -51,17 +54,17 @@ function CircularGauge({
             strokeDasharray={CIRCUMFERENCE}
             strokeDashoffset={offset}
             strokeLinecap="round"
-            className="text-white transition-[stroke-dashoffset]"
+            className="text-orange-400 transition-[stroke-dashoffset]"
           />
         </svg>
         <span
-          className="absolute inset-0 flex items-center justify-center text-sm font-medium text-white"
+          className="absolute inset-0 flex items-center justify-center text-sm font-medium text-slate-900"
           aria-label={`${label}: ${Math.round(pct)}%`}
         >
           {Math.round(pct)}
         </span>
       </div>
-      <span className="text-xs text-white/70">{label}</span>
+      <span className="text-xs text-slate-600">{label}</span>
     </div>
   );
 }
@@ -73,31 +76,31 @@ function OptionColumn({ result, optionLabel }: { result: SimulationResult; optio
     { scenario: result.worstCase, label: "Worst" },
   ];
   return (
-    <div className="space-y-3 sm:space-y-4">
-      <h2 className="text-base font-semibold tracking-tight text-white sm:text-lg">
+    <div className="space-y-4 sm:space-y-5">
+      <h2 className="text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
         Option {optionLabel}: {result.option || `Option ${optionLabel}`}
       </h2>
-      <div className="space-y-2 sm:space-y-3">
+      <div className="space-y-3 sm:space-y-4">
         {scenarios.map(({ scenario, label }) => (
           <ScenarioCard key={label} scenario={scenario} label={label} />
         ))}
       </div>
-      <div className="flex flex-wrap gap-4 sm:gap-6">
+      <div className="flex flex-wrap gap-6 sm:gap-8">
         <CircularGauge value={result.riskScore} label="Risk" />
         <CircularGauge value={result.stressLevel} label="Stress" />
       </div>
       {result.careerTrajectory ? (
-        <div className="space-y-1.5">
-          <h3 className="text-sm font-medium text-white">Career trajectory</h3>
-          <p className="text-sm text-white/80 leading-relaxed">
+        <div className="space-y-2">
+          <h3 className="text-sm font-bold text-slate-900">Career trajectory</h3>
+          <p className="text-sm text-slate-700 leading-relaxed">
             {result.careerTrajectory}
           </p>
         </div>
       ) : null}
       {result.reasoning.length > 0 ? (
-        <div className="space-y-1.5">
-          <h3 className="text-sm font-medium text-white">Reasoning</h3>
-          <ul className="list-disc list-inside space-y-1 text-sm text-white/80">
+        <div className="space-y-2">
+          <h3 className="text-sm font-bold text-slate-900">Reasoning</h3>
+          <ul className="list-disc list-inside space-y-1 text-sm text-slate-700">
             {result.reasoning.map((item, i) => (
               <li key={i}>{item}</li>
             ))}
@@ -119,52 +122,52 @@ export function ComparisonView({ data }: ComparisonViewProps) {
   const betterB = recommendation.better === "B";
 
   return (
-    <div className="space-y-6 sm:space-y-8 text-white">
-      <div className="grid grid-cols-1 gap-4 sm:gap-6 md:gap-8 md:grid-cols-2">
+    <div className="space-y-8 sm:space-y-10 text-slate-900">
+      {/* Bento-style two columns */}
+      <div className="grid grid-cols-1 gap-6 md:gap-8 md:grid-cols-2">
         <div
           className={cn(
-            "glass-card rounded-xl p-3 transition-all duration-200 sm:p-4",
-            "hover:shadow-glow hover:border-white/30",
-            betterA && "border-green-500/40 bg-green-500/10"
+            warmCardClass,
+            "p-5 sm:p-6",
+            betterA && "ring-2 ring-emerald-400/50"
           )}
         >
           <OptionColumn result={optionA} optionLabel="A" />
         </div>
         <div
           className={cn(
-            "glass-card rounded-xl p-3 transition-all duration-200 sm:p-4",
-            "hover:shadow-glow hover:border-white/30",
-            betterB && "border-green-500/40 bg-green-500/10"
+            warmCardClass,
+            "p-5 sm:p-6",
+            betterB && "ring-2 ring-emerald-400/50"
           )}
         >
           <OptionColumn result={optionB} optionLabel="B" />
         </div>
       </div>
 
-      <Separator className="bg-white/20" />
+      <Separator className="bg-white/70" />
 
-      <Card className="glass-card transition-all duration-200 hover:shadow-glow hover:border-white/30">
-        <CardHeader className="pb-2 p-4 sm:p-6">
-          <CardTitle className="text-base text-white">Recommendation</CardTitle>
+      <Card className={cn(warmCardClass, "overflow-hidden")}>
+        <CardHeader className="pb-2 p-6 sm:p-8">
+          <CardTitle className="text-lg font-bold text-slate-900">Recommendation</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3 pt-0 px-4 pb-4 sm:px-6 sm:pb-6">
+        <CardContent className="space-y-4 pt-0 px-6 pb-6 sm:px-8 sm:pb-8">
           <div className="flex flex-wrap items-center gap-2">
             {isTie ? (
-              <Badge variant="secondary" className="text-sm text-white/90 bg-white/20 border-white/30">
+              <Badge
+                variant="secondary"
+                className="text-sm font-medium text-slate-700 bg-amber-100/80 border-amber-200"
+              >
                 Tie
               </Badge>
             ) : (
-              <Badge
-                className={cn(
-                  "text-sm border-green-400/50 bg-green-500/20 text-green-300"
-                )}
-              >
+              <Badge className="text-sm font-medium bg-emerald-500/15 text-emerald-800 border border-emerald-400/40">
                 Option {recommendation.better} is better
               </Badge>
             )}
           </div>
           {recommendation.reason ? (
-            <p className="text-sm text-white/80 leading-relaxed">
+            <p className="text-sm text-slate-700 leading-relaxed">
               {recommendation.reason}
             </p>
           ) : null}
